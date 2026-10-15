@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curriculum Effectiveness Analysis | Big Data Learning Analytics Platform</title>
+  <meta name="description" content="Production-grade Big Data Curriculum Effectiveness Analysis & Student Outcome Prediction platform built on the Open University Learning Analytics Dataset (OULAD).">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons & Chart.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Application Banner -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Curriculum Effectiveness Analysis</h1>
+          <p class="subtitle">Big Data Lakehouse & Explainable ML Platform &bull; <span class="badge-dataset">OULAD 10.6M Records</span></p>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Ribbon -->
+      <div class="header-metrics">
+        <div class="h-metric">
+          <span class="hm-label">Total Cohort</span>
+          <span class="hm-value" id="hmTotalStudents">32,593</span>
+        </div>
+        <div class="h-metric">
+          <span class="hm-label">VLE Interactions</span>
+          <span class="hm-value" id="hmTotalClicks">10.65M</span>
+        </div>
+        <div class="h-metric">
+          <span class="hm-label">Active Modules</span>
+          <span class="hm-value" id="hmActiveCourses">7 (AAA-GGG)</span>
+        </div>
+        <div class="h-metric highlight">
+          <span class="hm-label">Model ROC-AUC</span>
+          <span class="hm-value" id="hmModelAuc">0.988</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-icon" title="Toggle Theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="refreshDataBtn" class="btn-secondary" title="Refresh Live Analytics">
+          <i class="fa-solid fa-rotate"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-bar">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="tabPerformance" id="tabBtnPerformance">
+        <i class="fa-solid fa-chart-line"></i> 1. Course Performance
+      </button>
+      <button class="nav-tab" data-tab="tabAssessments" id="tabBtnAssessments">
+        <i class="fa-solid fa-clipboard-check"></i> 2. Assessment Effectiveness
+      </button>
+      <button class="nav-tab" data-tab="tabEngagement" id="tabBtnEngagement">
+        <i class="fa-solid fa-network-wired"></i> 3. Student Engagement
+      </button>
+      <button class="nav-tab" data-tab="tabPrediction" id="tabBtnPrediction">
+        <i class="fa-solid fa-brain"></i> 4. Outcome Prediction & SHAP
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+
+    <!-- TAB 1: COURSE / CURRICULUM PERFORMANCE -->
+    <section id="tabPerformance" class="tab-panel active">
+      <div class="section-hero">
+        <div class="hero-text">
+          <h2>Level 1: Course & Curriculum Performance Analysis</h2>
+          <p>Comprehensive benchmarking of academic outcomes, pass rates, attrition timelines, and module completion indicators across presentations.</p>
+        </div>
+        <div class="hero-actions">
+          <span class="status-pill status-healthy"><i class="fa-solid fa-circle-check"></i> Lakehouse Parquet Sync</span>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon icon-emerald"><i class="fa-solid fa-trophy"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Overall Pass Rate</span>
+            <h3 class="kpi-value" id="kpiPassRate">--%</h3>
+            <span class="kpi-sub" id="kpiDistinctionSub">--% Distinction rate</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-rose"><i class="fa-solid fa-user-xmark"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Early Withdrawal Rate</span>
+            <h3 class="kpi-value" id="kpiWithdrawalRate">--%</h3>
+            <span class="kpi-sub" id="kpiFailSub">--% Academic Failures</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-indigo"><i class="fa-solid fa-file-pen"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Average Assessment Score</span>
+            <h3 class="kpi-value" id="kpiAvgScore">--</h3>
+            <span class="kpi-sub">Across continuous coursework</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-amber"><i class="fa-solid fa-arrow-pointer"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Avg Clicks / Student</span>
+            <h3 class="kpi-value" id="kpiAvgClicks">--</h3>
+            <span class="kpi-sub" id="kpiActiveDaysSub">-- avg active study days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Comparison Charts -->
+      <div class="chart-grid-2">
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-chart-bar"></i> Module Pass & Attrition Benchmark</h3>
+            <span class="panel-tag">Comparative Analysis</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="courseBenchmarkChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-chart-pie"></i> Cohort Academic Result Distribution</h3>
+            <span class="panel-tag">32,593 Students</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="outcomePieChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Performance Table -->
+      <div class="glass-panel mt-4">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-table-list"></i> Curriculum Modules Breakdown</h3>
+          <span class="panel-tag">Modules AAA &ndash; GGG</span>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="moduleTable">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Enrollments</th>
+                <th>Pass Rate</th>
+                <th>Distinction Rate</th>
+                <th>Withdrawal Rate</th>
+                <th>Fail Rate</th>
+                <th>Avg Score</th>
+                <th>Avg Clicks</th>
+                <th>Completion Rate</th>
+              </tr>
+            </thead>
+            <tbody id="moduleTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: ASSESSMENT EFFECTIVENESS -->
+    <section id="tabAssessments" class="tab-panel">
+      <div class="section-hero">
+        <div class="hero-text">
+          <h2>Assessment Effectiveness & Difficulty Analysis</h2>
+          <p>Evaluating TMA (Tutor Marked), CMA (Computer Marked), and Exam instruments, assessment weight calibration, and high-difficulty curriculum bottlenecks.</p>
+        </div>
+      </div>
+
+      <!-- Assessment Comparison Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon icon-cyan"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Tutor Marked (TMA)</span>
+            <h3 class="kpi-value" id="tmaAvgScore">--</h3>
+            <span class="kpi-sub" id="tmaSubmissions">Continuous tutor feedback</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-purple"><i class="fa-solid fa-laptop-code"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Computer Marked (CMA)</span>
+            <h3 class="kpi-value" id="cmaAvgScore">--</h3>
+            <span class="kpi-sub" id="cmaSubmissions">Automated formative quizzes</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-amber"><i class="fa-solid fa-award"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Examinations (Exam)</span>
+            <h3 class="kpi-value" id="examAvgScore">--</h3>
+            <span class="kpi-sub" id="examPassRate">Summative end-of-course</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-rose"><i class="fa-solid fa-clock"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Avg Late Submissions</span>
+            <h3 class="kpi-value" id="avgLateSubRate">--%</h3>
+            <span class="kpi-sub">Across all assessment types</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assessment Visualizations -->
+      <div class="chart-grid-2">
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-circle-nodes"></i> Assessment Weight vs. Difficulty Index</h3>
+            <span class="panel-tag">Calibration Matrix</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="weightDifficultyScatter"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-calendar-xmark"></i> Late Submission Impact on Passing</h3>
+            <span class="panel-tag">Submission Behavior</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="lateSubmissionImpactChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Critical Bottleneck Assessments Table -->
+      <div class="glass-panel mt-4">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-triangle-exclamation"></i> Curriculum Bottlenecks: High-Difficulty / Failure-Risk Assessments</h3>
+          <span class="panel-tag text-rose">Targeted Review Alerts</span>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Module</th>
+                <th>Presentation</th>
+                <th>Type</th>
+                <th>Weight</th>
+                <th>Avg Score</th>
+                <th>Pass Rate</th>
+                <th>Late Submissions</th>
+                <th>Difficulty Index</th>
+                <th>Curriculum Risk Status</th>
+              </tr>
+            </thead>
+            <tbody id="challengingAssessmentsBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: STUDENT ENGAGEMENT & VLE DYNAMICS -->
+    <section id="tabEngagement" class="tab-panel">
+      <div class="section-hero">
+        <div class="hero-text">
+          <h2>Virtual Learning Environment (VLE) Engagement Dynamics</h2>
+          <p>Analyzing 10.6M student clickstreams, active study days, activity types (forums, content, quizzes, resources), and temporal engagement milestones.</p>
+        </div>
+      </div>
+
+      <!-- Engagement KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon icon-emerald"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Active Days Correlation</span>
+            <h3 class="kpi-value">+0.578</h3>
+            <span class="kpi-sub">Highest behavioral factor with passing</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-indigo"><i class="fa-solid fa-bolt"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Pre-Course Clicks Impact</span>
+            <h3 class="kpi-value">+28.4%</h3>
+            <span class="kpi-sub">Passing boost for early-onboarded</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-purple"><i class="fa-solid fa-comments"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Forum Interaction</span>
+            <h3 class="kpi-value">3.4x Higher</h3>
+            <span class="kpi-sub">In Distinction vs Withdrawn cohorts</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-cyan"><i class="fa-solid fa-puzzle-piece"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-title">Formative Quizzes</span>
+            <h3 class="kpi-value">p &lt; 0.001</h3>
+            <span class="kpi-sub">Statistically significant score boost</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Engagement Charts -->
+      <div class="chart-grid-2">
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-layer-group"></i> Active Study Days vs. Passing Probability</h3>
+            <span class="panel-tag">Cadence vs Success</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="activeDaysTierChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-chart-radar"></i> VLE Resource Category Usage by Outcome</h3>
+            <span class="panel-tag">Resource Effectiveness</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="resourceBreakdownChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Temporal Milestone Engagement -->
+      <div class="glass-panel mt-4">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-timeline"></i> Temporal Engagement Milestones (Pre &bull; Early &bull; Mid &bull; Late)</h3>
+          <span class="panel-tag">Cohort Clickstream Analysis</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="temporalEngagementChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: OUTCOME PREDICTION & SHAP SIMULATOR -->
+    <section id="tabPrediction" class="tab-panel">
+      <div class="section-hero">
+        <div class="hero-text">
+          <h2>Level 2: Student Outcome Prediction & Explainable AI (SHAP)</h2>
+          <p>Real-time predictive simulation with machine learning (Random Forest, Gradient Boosting, Decision Tree, Logistic Regression), local SHAP attribution, and automated academic advisor interventions.</p>
+        </div>
+        <div class="hero-actions">
+          <span class="status-pill status-healthy"><i class="fa-solid fa-microchip"></i> Active Model: Gradient Boosting (ROC-AUC: 0.988)</span>
+        </div>
+      </div>
+
+      <!-- Model Performance Comparison Grid -->
+      <div class="glass-panel mb-4">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-scale-balanced"></i> Big Data ML Models Benchmark Evaluation</h3>
+          <span class="panel-tag">Test Cohort: 6,519 Students (20% Stratified)</span>
+        </div>
+        <div class="models-benchmark-grid" id="modelsBenchmarkGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Interactive Simulator & SHAP Explanation Layout -->
+      <div class="simulator-layout">
+        <!-- Left: Input Simulator Form -->
+        <div class="glass-panel simulator-card">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-sliders"></i> Real-Time Student Profile Simulator</h3>
+            <button class="btn-sm btn-outline" id="loadPresetBtn">Load At-Risk Student</button>
+          </div>
+
+          <form id="predictionForm" class="sim-form">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="simModule">Course Module</label>
+                <select id="simModule" class="form-control">
+                  <option value="AAA">AAA - Humanities (60cr)</option>
+                  <option value="BBB" selected>BBB - Social Sciences (60cr)</option>
+                  <option value="CCC">CCC - STEM (120cr)</option>
+                  <option value="DDD">DDD - STEM Advanced (120cr)</option>
+                  <option value="EEE">EEE - Technology (60cr)</option>
+                  <option value="FFF">FFF - Computing (120cr)</option>
+                  <option value="GGG">GGG - Open Courses (30cr)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="simEducation">Highest Education</label>
+                <select id="simEducation" class="form-control">
+                  <option value="A Level or Equivalent" selected>A Level or Equivalent</option>
+                  <option value="HE Qualification">HE Qualification</option>
+                  <option value="Lower Than A Level">Lower Than A Level</option>
+                  <option value="Post Graduate Qualification">Post Graduate Qualification</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>VLE Active Days</span>
+                <span class="slider-val" id="valActiveDays">45 days</span>
+              </div>
+              <input type="range" id="simActiveDays" min="0" max="150" value="45" class="slider-input">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>Average Assessment Score</span>
+                <span class="slider-val" id="valAvgScore">68.5</span>
+              </div>
+              <input type="range" id="simAvgScore" min="0" max="100" value="68.5" step="0.5" class="slider-input">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>Assessment Completion Rate</span>
+                <span class="slider-val" id="valCompletionRate">80%</span>
+              </div>
+              <input type="range" id="simCompletionRate" min="0" max="100" value="80" class="slider-input">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>Late Submission Rate</span>
+                <span class="slider-val" id="valLateRate">10%</span>
+              </div>
+              <input type="range" id="simLateRate" min="0" max="100" value="10" class="slider-input">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>Total VLE Clicks</span>
+                <span class="slider-val" id="valTotalClicks">1,200</span>
+              </div>
+              <input type="range" id="simTotalClicks" min="0" max="6000" value="1200" step="50" class="slider-input">
+            </div>
+
+            <div class="form-row-2 mt-2">
+              <div class="form-group">
+                <label for="simStudiedCredits">Studied Credits</label>
+                <input type="number" id="simStudiedCredits" value="60" min="30" max="360" step="30" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="simPrevAttempts">Prev Attempts</label>
+                <input type="number" id="simPrevAttempts" value="0" min="0" max="6" class="form-control">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary w-100 mt-3" id="simulateBtn">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Outcome & Run SHAP
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Prediction & SHAP Waterfall Explainer Result -->
+        <div class="glass-panel prediction-result-card">
+          <div class="panel-header">
+            <h3><i class="fa-solid fa-bullseye"></i> Prediction Result & Risk Assessment</h3>
+            <span class="status-pill" id="riskBadge">Evaluating...</span>
+          </div>
+
+          <!-- Outcome Gauge & Probabilities -->
+          <div class="pred-summary-box">
+            <div class="pred-gauge-side">
+              <div class="pred-score-gauge">
+                <span class="gauge-value" id="predPassProb">--%</span>
+                <span class="gauge-label">Pass Probability</span>
+              </div>
+            </div>
+            <div class="pred-details-side">
+              <div class="pred-outcome-title" id="predOutcomeTitle">Predicted Outcome: --</div>
+              <p class="pred-outcome-desc" id="predOutcomeDesc">Run simulation to evaluate student learning trajectory.</p>
+              <div class="prob-bar-container">
+                <div class="prob-bar">
+                  <div class="prob-fill-pass" id="probFillPass" style="width: 50%;"></div>
+                  <div class="prob-fill-fail" id="probFillFail" style="width: 50%;"></div>
+                </div>
+                <div class="prob-labels">
+                  <span id="probPassLabel">Pass: --%</span>
+                  <span id="probFailLabel">Fail / Risk: --%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Local SHAP Factor Attribution Waterfall -->
+          <div class="shap-section mt-4">
+            <div class="section-title-row">
+              <h4><i class="fa-solid fa-code-compare"></i> Individual SHAP Factor Attribution</h4>
+              <span class="panel-tag">Feature Contributions</span>
+            </div>
+            <p class="shap-subtitle">Quantifying exact features pushing toward Academic Pass (Green) versus Increasing Failure Risk (Red).</p>
+            <div class="shap-waterfall-list" id="shapFactorsList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Automated Pedagogical Interventions -->
+          <div class="interventions-section mt-4">
+            <div class="section-title-row">
+              <h4><i class="fa-solid fa-hand-holding-heart"></i> Tailored Academic Advisor Interventions</h4>
+              <span class="panel-tag text-emerald">Actionable Guidance</span>
+            </div>
+            <div class="interventions-list" id="interventionsList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 Curriculum Effectiveness Analysis Platform &bull; Built with PySpark, Lakehouse Parquet, Scikit-Learn, SHAP & FastAPI.</p>
+      <p class="footer-sub">Open University Learning Analytics Dataset (OULAD) Research Implementation &bull; Slide Architecture Level 1 &amp; Level 2 Complete.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

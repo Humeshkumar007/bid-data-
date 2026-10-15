@@ -1,0 +1,84 @@
+{
+  "best_model_name": "Gradient Boosting",
+  "models": {
+    "Logistic Regression": {
+      "accuracy": 0.9449,
+      "precision": 0.9239,
+      "recall": 0.9626,
+      "f1_score": 0.9429,
+      "roc_auc": 0.9849,
+      "confusion_matrix": [
+        [
+          3198,
+          244
+        ],
+        [
+          115,
+          2962
+        ]
+      ],
+      "training_time_seconds": 0.34
+    },
+    "Decision Tree": {
+      "accuracy": 0.9417,
+      "precision": 0.9174,
+      "recall": 0.9633,
+      "f1_score": 0.9398,
+      "roc_auc": 0.9832,
+      "confusion_matrix": [
+        [
+          3175,
+          267
+        ],
+        [
+          113,
+          2964
+        ]
+      ],
+      "training_time_seconds": 0.33
+    },
+    "Random Forest": {
+      "accuracy": 0.9439,
+      "precision": 0.9167,
+      "recall": 0.9691,
+      "f1_score": 0.9422,
+      "roc_auc": 0.9856,
+      "confusion_matrix": [
+        [
+          3171,
+          271
+        ],
+        [
+          95,
+          2982
+        ]
+      ],
+      "training_time_seconds": 1.2
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.9491,
+      "precision": 0.9269,
+      "recall": 0.9685,
+      "f1_score": 0.9472,
+      "roc_auc": 0.9878,
+      "confusion_matrix": [
+        [
+          3207,
+          235
+        ],
+        [
+          97,
+          2980
+        ]
+      ],
+      "training_time_seconds": 20.55
+    }
+  },
+  "test_sample_size": 6519,
+  "train_sample_size": 26074,
+  "feature_count": 42,
+  "target_distribution": {
+    "pass_ratio": 0.472,
+    "fail_ratio": 0.528
+  }
+}
